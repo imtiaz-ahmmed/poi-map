@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bangladesh Administrative Boundary - POI MAP</title>
+
+    <!-- Leaflet CSS CDN -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      crossorigin=""
+    />
+
+    <!-- Your custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      /* Basic page and map styles */
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      #map {
+        width: 100%;
+        height: 100vh; /* full viewport height */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="navbar">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search place name (level 2 to 5)..."
+      />
+      <button id="searchBtn">Search</button>
+    </div>
+    <!-- Hamburger Menu Button -->
+    <div id="hamburger" class="hamburger">&#9776;</div>
+
+    <!-- Sidebar for POI Form -->
+    <div id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <h3>POI Management</h3>
+        <span id="closeSidebar" class="close-btn">&times;</span>
+      </div>
+
+      <form id="updatePOIForm">
+        <label for="divisionSelect">Division</label>
+        <select id="divisionSelect" required>
+          <option value="">-- Select Division --</option>
+        </select>
+
+        <label for="districtSelect">District</label>
+        <select id="districtSelect" disabled required>
+          <option value="">-- Select District --</option>
+        </select>
+
+        <label for="upazilaSelect">Upazila</label>
+        <select id="upazilaSelect" disabled required>
+          <option value="">-- Select Upazila --</option>
+        </select>
+
+        <label for="poiCount">POI Count</label>
+        <input type="number" id="poiCount" min="0" required />
+
+        <label for="userName">Completed By</label>
+        <input type="text" id="userName" placeholder="Enter name" />
+
+        <label for="startDate">Start Date</label>
+        <input type="date" id="startDate" />
+
+        <label for="endDate">End Date</label>
+        <input type="date" id="endDate" />
+
+        <label for="statusSelect">Status</label>
+        <select id="statusSelect" required>
+          <option value="">-- Select Status --</option>
+          <option value="Complete">Complete</option>
+          <option value="Incomplete">Incomplete</option>
+          <option value="Partially">Partially</option>
+          <option value="Ongoing">Ongoing</option>
+        </select>
+
+        <label for="notes">Notes</label>
+        <input type="text" id="notes" placeholder="Enter notes here" />
+
+        <button type="submit">Update</button>
+
+        <div id="poweredByText">Powered by Zedandzed IT Services Ltd.</div>
+      </form>
+
+      <div id="toast" class="toast-hidden"></div>
+      <div id="statusLegend">
+        <div>
+          <span class="color-box" style="background: #a8e6a1"></span>
+          <span style="color: #a8e6a1">Complete</span>
+        </div>
+        <div>
+          <span
+            class="color-box"
+            style="background: transparent; border: 1px solid #ccc"
+          ></span>
+          <span style="color: #999">Incomplete</span>
+        </div>
+        <div>
+          <span class="color-box" style="background: #7251e9ff"></span>
+          <span style="color: #7251e9ff">Partially</span>
+        </div>
+        <div>
+          <span class="color-box" style="background: #f28c28"></span>
+          <span style="color: #f28c28">Ongoing</span>
+        </div>
+      </div>
+
+      <img src="Assests/images/logo.png" alt="LYFE Logo" id="logoBottomLeft" />
+    </div>
+    <div id="poweredByFooter">Powered by Zedandzed IT Services Ltd.</div>
+
+    <div id="map"></div>
+
+    <!-- Modal -->
+    <div id="infoModal" class="modal">
+      <div class="modal-content">
+        <span id="closeModal" class="close">&times;</span>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+    <div id="infoTooltip"></div>
+    <!-- Leaflet JS CDN -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      crossorigin=""
+    ></script>
+
+    <!-- Your custom script -->
+    <script src="script.js"></script>
+  </body>
+</html>

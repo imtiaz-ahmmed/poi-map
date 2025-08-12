@@ -1,0 +1,492 @@
+/* Reset default margins & paddings */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body styles */
+body,
+html {
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f5f5f5;
+}
+
+/* Navbar with search input and button */
+#navbar {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+#searchInput {
+  width: 250px;
+  padding: 6px 8px;
+  font-size: 14px;
+  border: 1.5px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+#searchInput:focus {
+  border-color: #1976d2;
+}
+
+#searchBtn {
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  background-color: #1976d2;
+  color: white;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+#searchBtn:hover {
+  background-color: #145a9f;
+}
+
+/* Adjust map height so navbar overlays on top */
+#map {
+  width: 100%;
+  height: 100vh; /* keep full viewport height */
+  border: 2px solid #ccc;
+  position: relative;
+  z-index: 1;
+}
+
+/* Popup styling */
+.leaflet-popup-content {
+  font-size: 14px;
+  color: #333;
+  font-weight: normal;
+}
+
+/* Popup title (if using strong tag) */
+.leaflet-popup-content strong {
+  font-size: 16px;
+  color: #000;
+}
+
+/* Leaflet zoom controls custom position and style */
+.leaflet-control-zoom {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover effect for polygons (optional if you add interaction) */
+.path-hover {
+  fill-opacity: 0.6 !important;
+  stroke-width: 3 !important;
+  color: #000 !important;
+}
+
+.leaflet-interactive:focus {
+  outline: none !important;
+}
+
+/* Modal styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #000;
+}
+
+#toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  background-color: #323232;
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-size: 16px;
+  font-weight: 500;
+  max-width: 300px;
+  text-align: center;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  user-select: none;
+}
+
+.toast-show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(100%);
+}
+
+#logoBottomLeft {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  width: 40px; /* adjust size as needed */
+  height: auto;
+  z-index: 10000;
+  user-select: none;
+  pointer-events: none;
+}
+
+#statusLegend {
+  position: fixed;
+  bottom: 70px; /* a bit above the logo */
+  left: 10px;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  color: #333;
+  z-index: 10000;
+  user-select: none;
+  max-width: 180px;
+}
+
+#statusLegend div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+#statusLegend div:last-child {
+  margin-bottom: 0;
+}
+
+.color-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  display: inline-block;
+  border: 1px solid transparent;
+}
+
+#poweredByText {
+  font-size: 14px;
+  color: #b0bec5;
+  font-weight: 500;
+  font-family: Arial, sans-serif;
+  padding-top: 10px;
+  text-align: center;
+  user-select: none;
+}
+
+/* Hamburger Button */
+.hamburger {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1200;
+  background: #1a73e8;
+  color: whitesmoke;
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(26, 115, 232, 0.5);
+  transition: background-color 0.3s ease, transform 0.15s ease;
+  user-select: none;
+}
+
+.hamburger:hover,
+.hamburger:focus {
+  background: #155ab6;
+  outline: none;
+  transform: scale(1.05);
+}
+
+.hamburger svg {
+  fill: white;
+  width: 20px;
+  height: 20px;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: -280px; /* hidden */
+  width: 280px;
+  height: 100vh;
+  background: #20232a;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.4);
+  padding: 24px 20px;
+  overflow-y: auto;
+  transition: right 0.3s ease;
+  z-index: 1150;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #cfd8dc;
+  border-left: 1px solid #333842;
+}
+
+/* Sidebar open */
+.sidebar.open {
+  right: 0;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #333842;
+  padding-bottom: 4px;
+}
+
+.sidebar-header h3 {
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  color: #90caf9;
+  text-transform: uppercase;
+}
+
+.close-btn {
+  font-size: 26px;
+  cursor: pointer;
+  color: #546e7a;
+  user-select: none;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #90caf9;
+}
+
+/* Form container */
+#updatePOIForm {
+  max-width: 320px; /* narrower form width */
+  margin: 20px auto;
+  padding: 4px;
+  border-radius: 12px;
+  background: #1e242f;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.3);
+  color: #b0bec5;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Labels */
+#updatePOIForm label {
+  display: block;
+  margin: 10px 0 4px;
+  font-weight: 500;
+  font-size: 0.7rem;
+  color: #b0bec5;
+}
+
+/* Inputs, selects, and date pickers */
+#updatePOIForm select,
+#updatePOIForm input[type="number"],
+#updatePOIForm input[type="text"],
+#updatePOIForm input[type="date"] {
+  width: 100%;
+  padding: 4px 8px; /* smaller padding */
+  font-size: 0.85rem; /* smaller font */
+  line-height: 1.1;
+  border-radius: 6px;
+  border: none;
+  background: #2c313c;
+  color: #eceff1;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Focus state for inputs and selects */
+#updatePOIForm select:focus,
+#updatePOIForm input[type="number"]:focus,
+#updatePOIForm input[type="text"]:focus,
+#updatePOIForm input[type="date"]:focus {
+  outline: none;
+  background: #394150;
+  color: #ffffff;
+}
+
+/* Disabled selects */
+#updatePOIForm select:disabled {
+  background-color: #424a5a;
+  color: #78909c;
+  cursor: not-allowed;
+}
+
+/* Submit button */
+#updatePOIForm button[type="submit"] {
+  width: 100%;
+  padding: 8px 0; /* smaller vertical padding */
+  margin-top: 20px;
+  border-radius: 8px;
+  border: none;
+  background: #1a73e8;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+
+#updatePOIForm button[type="submit"]:hover,
+#updatePOIForm button[type="submit"]:focus {
+  background: #155ab6;
+  outline: none;
+}
+
+/* Powered by text */
+#poweredByText {
+  font-size: 14px;
+  color: #b0bec5;
+  font-weight: 500;
+  font-family: Arial, sans-serif;
+  padding-top: 10px;
+  text-align: center;
+  user-select: none;
+}
+
+/* Message */
+#poi-message {
+  margin-top: 16px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #4caf50;
+  text-align: center;
+  min-height: 24px;
+}
+
+#infoTooltip {
+  position: absolute;
+  max-width: 300px; /* adjust width as needed */
+  max-height: 200px; /* limit height for scroll */
+  overflow-y: auto; /* vertical scrollbar if content too tall */
+  background: white;
+  border: 1px solid #888;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  display: none;
+  pointer-events: auto;
+  font-size: 14px;
+  color: #222;
+}
+
+#infoTooltip table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#infoTooltip table th,
+#infoTooltip table td {
+  border-bottom: 1px solid #ddd;
+  padding: 4px 6px;
+  text-align: left;
+}
+
+#modalBody p {
+  font-size: 1rem;
+  margin: 0 0 12px;
+  color: #333;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+#modalBody table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+#modalBody table th,
+#modalBody table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  font-weight: 400;
+}
+
+#modalBody table th {
+  background-color: #1976d2;
+  color: white;
+  font-weight: 600;
+}
+
+#modalBody table tr:hover {
+  background-color: #f0f7ff;
+}
+#poweredByFooter {
+  position: fixed;
+  bottom: 2px;
+  right: 2px;
+  font-size: 0.85rem;
+  color: #f4f8f4;
+  background: #1a3567;
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  user-select: none;
+  opacity: 1;
+  animation: fadeInOut 6s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.1;
+  }
+}
