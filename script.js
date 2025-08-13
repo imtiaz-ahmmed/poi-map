@@ -196,14 +196,14 @@ function onEachFeature(feature, layer) {
 
       if (level === "level1") {
         popupContent += `
-        <div style="display:flex; align-items:center; gap:6px; margin-bottom:14px; max-width:160px; white-space:nowrap;">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:7px; max-width:160px; white-space:nowrap;">
           <div style="font-weight:600; font-size:.8rem; color:#283593;">Division:</div>
-          <div style="font-size:1.1rem;">${props.NAME_1}</div>
+          <div style="font-size:.8rem;">${props.NAME_1}</div>
         </div>
 
         <div style="display:flex; align-items:center; gap:6px; margin-bottom:14px; max-width:160px; white-space:nowrap;">
           <div style="font-weight:600; font-size:.8rem; color:#283593;">POI :</div>
-          <div style="font-size:1.8rem; font-weight:800; color:#1565c0; margin-top:0;">${totalPOI}</div>
+          <div style="font-size:1.1rem; font-weight:800; color:#1565c0; margin-top:0;">${totalPOI}</div>
         </div>
       `;
       } else if (level === "level2") {
@@ -223,7 +223,7 @@ function onEachFeature(feature, layer) {
 
         popupContent += `
         <div style="font-weight:600; font-size:.8rem; margin-bottom:6px; color:#283593;">District: ${props.NAME_2}</div>
-        <div style="font-weight:600; font-size:1.1rem; margin-top:12px; color:#283593;">POI : ${totalPOI}</div>
+        <div style="font-weight:600; font-size:.8rem; margin-top:12px; color:#283593;">POI : ${totalPOI}</div>
 
         <div style="max-height: 150px; overflow-y: auto; border: 1px solid #c5cae9; margin-top: 8px;">
           <table style="width:100%; border-collapse:collapse; color:#3949ab; font-size:0.9rem;">
@@ -253,10 +253,13 @@ function onEachFeature(feature, layer) {
       } else if (level === "level3")
         popupContent += `
   <div style="font-weight:600; font-size:.8rem; margin-bottom:4px; color:#283593;">
+    District: ${props.NAME_2}
+  </div>
+  <div style="font-weight:600; font-size:.8rem; margin-bottom:4px; color:#283593;">
     Upazila: ${props.NAME_3}
   </div>
 
-  <div style="font-weight:600; font-size:1.1rem; margin-bottom:8px; color:#1a237e;">
+  <div style="font-weight:600; font-size:.9rem; margin-bottom:8px; color:#1a237e;">
     POI: ${totalPOI}
   </div>
 
@@ -273,8 +276,6 @@ function onEachFeature(feature, layer) {
       .setContent(popupContent)
       .openOn(map);
   });
-
-  // No hover or color change on mouseover per your request
 }
 
 // ---- AGGREGATION / SEARCH HELPERS ----
@@ -439,7 +440,6 @@ function zoomToFeature(name) {
   // Ensure it stays on top
   layer.bringToFront();
 
-  // Optional: add a glow effect (simulate soft focus)
   if (layer._path) {
     layer._path.style.filter = "drop-shadow(0 0 6px #f44336)";
   }
@@ -496,10 +496,10 @@ function uniqueBoundaryStyle(palette) {
     const borderColor = palette[idx % palette.length];
 
     return {
-      color: borderColor, // Outline color
-      weight: 2, // Outline thickness
+      color: borderColor,
+      weight: 2,
       fillColor: "transparent",
-      fillOpacity: 0, // Fully transparent fill
+      fillOpacity: 0,
     };
   };
 }
@@ -560,7 +560,7 @@ Promise.all([
       if (level3Layer) {
         level3Layer.setStyle(uniqueBoundaryStyle(palettes.level3));
         level3Layer.eachLayer((layer) => {
-          layer.options.interactive = true; // enable clicks
+          layer.options.interactive = true;
         });
         map.addLayer(level3Layer);
       }
@@ -568,7 +568,7 @@ Promise.all([
       if (level3Layer) {
         level3Layer.setStyle(uniqueBoundaryStyle(palettes.level3));
         level3Layer.eachLayer((layer) => {
-          layer.options.interactive = false; // disable clicks so clicks pass through
+          layer.options.interactive = false;
         });
         map.addLayer(level3Layer);
       }
@@ -599,7 +599,7 @@ Promise.all([
       if (level5Layer) {
         level5Layer.setStyle(uniqueBoundaryStyle(palettes.level5));
         level5Layer.eachLayer((layer) => {
-          layer.options.interactive = true; // Enable Level 5 clicks
+          layer.options.interactive = true;
         });
         map.addLayer(level5Layer);
       }
@@ -607,17 +607,17 @@ Promise.all([
       if (level4Layer) {
         level4Layer.setStyle(statusBasedStyle);
         level4Layer.eachLayer((layer) => {
-          layer.options.interactive = false; // Disable Level 4 clicks
+          layer.options.interactive = false;
         });
-        map.addLayer(level4Layer); // Show as background only
+        map.addLayer(level4Layer);
       }
 
       if (level3Layer) {
         level3Layer.setStyle(uniqueBoundaryStyle(palettes.level3));
         level3Layer.eachLayer((layer) => {
-          layer.options.interactive = false; // No clicks
+          layer.options.interactive = false;
         });
-        map.addLayer(level3Layer); // Still show boundary for context
+        map.addLayer(level3Layer);
         level3Layer.bringToFront();
       }
     }
@@ -708,7 +708,6 @@ document
     const upazila = e.target.value;
 
     if (!division || !district || !upazila) {
-      // Clear form fields if incomplete
       document.getElementById("poiCount").value = "";
       document.getElementById("statusSelect").value = "";
       document.getElementById("notes").value = "";
@@ -734,7 +733,7 @@ document
     } catch (err) {
       console.error(err);
       alert("Could not load existing POI data.");
-      // Clear form fields on error
+
       document.getElementById("poiCount").value = "";
       document.getElementById("statusSelect").value = "";
       document.getElementById("notes").value = "";
@@ -746,20 +745,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const hamburger = document.getElementById("hamburger");
   const closeBtn = document.getElementById("closeSidebar");
 
-  // Set your secret security code here:
-  const SECURITY_CODE = "1234";
+  // Secret security code:
+  const SECURITY_CODE = "znzit";
 
   if (!sidebar || !hamburger || !closeBtn) return;
 
   // Function to open sidebar
   const openSidebar = () => {
     sidebar.classList.add("open");
+    document.body.classList.add("sidebar-open");
     hamburger.setAttribute("aria-expanded", "true");
   };
 
   // Function to close sidebar
   const closeSidebar = () => {
     sidebar.classList.remove("open");
+    document.body.classList.remove("sidebar-open");
     hamburger.setAttribute("aria-expanded", "false");
   };
 
@@ -773,10 +774,19 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // Check if the code was already verified in this session
+    const isVerified = sessionStorage.getItem("sidebarSecurityVerified");
+
+    if (isVerified === "true") {
+      openSidebar();
+      return;
+    }
+
     // Ask for security code
     const enteredCode = prompt("Enter security code to open sidebar:");
 
     if (enteredCode === SECURITY_CODE) {
+      sessionStorage.setItem("sidebarSecurityVerified", "true");
       openSidebar();
     } else {
       alert("Incorrect security code. Access denied.");
@@ -934,7 +944,6 @@ document
               "Updated on server but couldn't find matching feature in level4Data"
             );
           } else {
-            // refresh search index if needed
             prepareSearchIndex();
           }
         }

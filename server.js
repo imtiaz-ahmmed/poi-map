@@ -6,9 +6,8 @@ const app = express();
 const PORT = 3000;
 
 app.use(bodyParser.json());
-app.use(express.static(__dirname)); // Serve index.html, script.js, style.css
+app.use(express.static(__dirname));
 
-// Helper to normalize strings for case-insensitive matching
 const normalize = (s) => (s || "").toString().trim().toLowerCase();
 
 app.get("/get-poi", (req, res) => {

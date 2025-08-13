@@ -169,17 +169,19 @@ html {
   position: fixed;
   bottom: 10px;
   left: 10px;
-  width: 80px; /* adjust size as needed */
+  width: 105px;
   height: auto;
   z-index: 10000;
   user-select: none;
   pointer-events: none;
+
+  border-radius: 8px;
 }
 
 #statusLegend {
   position: fixed;
-  bottom: 70px; /* a bit above the logo */
-  left: 10px;
+  bottom: 120px; /* a bit above the logo */
+  right: 10px;
   background: #fff;
   padding: 8px 12px;
   border-radius: 8px;
@@ -187,7 +189,7 @@ html {
   font-family: Arial, sans-serif;
   font-size: 13px;
   color: #333;
-  z-index: 10000;
+  z-index: 11000;
   user-select: none;
   max-width: 180px;
 }
@@ -219,6 +221,13 @@ html {
   padding-top: 10px;
   text-align: center;
   user-select: none;
+}
+
+#poweredByText a {
+  text-decoration: none;
+  color: #b0bec5;
+  font-weight: inherit;
+  font-family: inherit;
 }
 
 /* Hamburger Button */
@@ -294,7 +303,9 @@ html {
   color: #90caf9;
   text-transform: uppercase;
 }
-
+body.sidebar-open #statusLegend {
+  display: none;
+}
 .close-btn {
   font-size: 26px;
   cursor: pointer;
@@ -386,13 +397,14 @@ html {
 
 /* Powered by text */
 #poweredByText {
-  font-size: 14px;
+  font-size: 12px;
   color: #b0bec5;
   font-weight: 500;
   font-family: Arial, sans-serif;
   padding-top: 10px;
   text-align: center;
   user-select: none;
+  text-decoration: none;
 }
 
 /* Message */
