@@ -1,5 +1,10 @@
 // Initialize the map
-var map = L.map("map").setView([23.685, 90.3563], 6);
+var map = L.map("map", {
+  minZoom: 5,
+  maxZoom: 20, // You can adjust this
+  zoomSnap: 0, // Allow any fractional zoom
+  zoomDelta: 0.25, // Each zoom step is 0.25
+}).setView([23.685, 90.3563], 6.25);
 
 L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
   attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
@@ -111,6 +116,19 @@ function getFeatureLevel(props) {
   if (props.NAME_2) return "level2";
   if (props.NAME_1) return "level1";
   return null;
+}
+//Date Format
+function formatDateToShort(dateString) {
+  if (!dateString) return "";
+
+  const date = new Date(dateString);
+  if (isNaN(date)) return dateString; // Return original if invalid date
+
+  const day = date.getDate();
+  const monthShort = date.toLocaleString("en-US", { month: "short" });
+  const year = date.getFullYear().toString().slice(-2);
+
+  return `${day} ${monthShort} ${year}`;
 }
 
 // Core click / tooltip behavior (no hover color change)
@@ -265,8 +283,8 @@ function onEachFeature(feature, layer) {
 
   <div style="background:#f3f4f6; padding:6px 10px; border-radius:6px; font-size:0.65rem; line-height:1.4; color:#37474f; border:1px solid #cfd8dc;">
     <div>Completed By: ${props.Completed_By || " "}</div>
-    <div>Start Date: ${props.Start_Date || " "}</div>
-    <div>End Date: ${props.End_Date || " "}</div>
+    <div>Start Date: ${formatDateToShort(props.Start_Date)}</div>
+<div>End Date: ${formatDateToShort(props.End_Date)}</div>
   </div>
 `;
     }
@@ -552,11 +570,14 @@ Promise.all([
       }
     );
 
-    if (z < 8) {
+    if (z < 6.5) {
+      // Level 1
       if (level1Layer) map.addLayer(level1Layer);
-    } else if (z >= 8 && z < 9) {
+    } else if (z >= 6.5 && z < 7.5) {
+      // Level 2
       if (level2Layer) map.addLayer(level2Layer);
-    } else if (z >= 9 && z < 10) {
+    } else if (z >= 7.5 && z < 8) {
+      // Level 3 interactive
       if (level3Layer) {
         level3Layer.setStyle(uniqueBoundaryStyle(palettes.level3));
         level3Layer.eachLayer((layer) => {
@@ -564,7 +585,8 @@ Promise.all([
         });
         map.addLayer(level3Layer);
       }
-    } else if (z >= 10 && z < 11) {
+    } else if (z >= 8 && z < 9) {
+      // Level 3 non-interactive + Level 4 fill
       if (level3Layer) {
         level3Layer.setStyle(uniqueBoundaryStyle(palettes.level3));
         level3Layer.eachLayer((layer) => {
@@ -575,11 +597,12 @@ Promise.all([
       if (level4Layer) {
         level4Layer.setStyle(statusFillOnlyStyle);
         level4Layer.eachLayer((layer) => {
-          layer.options.interactive = true; // enable clicks
+          layer.options.interactive = true;
         });
         map.addLayer(level4Layer);
       }
-    } else if (z >= 11 && z < 12) {
+    } else if (z >= 9 && z < 14.5) {
+      // Level 3 non-interactive + Level 4 styled
       if (level3Layer) {
         level3Layer.setStyle(uniqueBoundaryStyle(palettes.level3));
         level3Layer.eachLayer((layer) => {
@@ -594,8 +617,8 @@ Promise.all([
         });
         map.addLayer(level4Layer);
       }
-    } else if (z >= 12) {
-      // Level 5 visible
+    } else {
+      // Level 5 + Level 4 non-interactive + Level 3 on top
       if (level5Layer) {
         level5Layer.setStyle(uniqueBoundaryStyle(palettes.level5));
         level5Layer.eachLayer((layer) => {
@@ -603,7 +626,6 @@ Promise.all([
         });
         map.addLayer(level5Layer);
       }
-
       if (level4Layer) {
         level4Layer.setStyle(statusBasedStyle);
         level4Layer.eachLayer((layer) => {
@@ -611,7 +633,6 @@ Promise.all([
         });
         map.addLayer(level4Layer);
       }
-
       if (level3Layer) {
         level3Layer.setStyle(uniqueBoundaryStyle(palettes.level3));
         level3Layer.eachLayer((layer) => {
