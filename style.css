@@ -169,7 +169,7 @@ html {
   position: fixed;
   bottom: 10px;
   left: 10px;
-  width: 40px; /* adjust size as needed */
+  width: 80px; /* adjust size as needed */
   height: auto;
   z-index: 10000;
   user-select: none;
