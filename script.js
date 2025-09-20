@@ -381,34 +381,76 @@ function addFeaturesForSearch(layer, level) {
   if (!layer) return;
   layer.eachLayer((l) => {
     const props = l.feature.properties;
-    let nameProp;
-    switch (level) {
-      case "level2":
-        nameProp = "NAME_1";
-        break;
-      case "level3":
-        nameProp = "NAME_2";
-        break;
-      case "level4":
-        nameProp = "NAME_3";
-        break;
-      case "level5":
-        nameProp = "NAME_4";
-        break;
-      default:
-        nameProp = null;
-    }
-    let name = props[nameProp];
+    let upazila = props.NAME_3 || "";
+    let district = props.NAME_2 || "";
+    let division = props.NAME_1 || "";
+
+    let name;
+    if (level === "level4") name = upazila;
+    else if (level === "level3") name = district;
+    else if (level === "level2") name = division;
+    else name = "";
+
     if (name) {
       searchableFeatures.push({
         name: name.toLowerCase(),
         displayName: name,
+        upazila,
+        district,
+        division,
         layer: l,
         bounds: l.getBounds(),
       });
     }
   });
 }
+const searchInput = document.getElementById("searchInput");
+const suggestionsBox = document.getElementById("suggestions");
+
+searchInput.addEventListener("input", () => {
+  const query = searchInput.value.trim().toLowerCase();
+  suggestionsBox.innerHTML = "";
+  if (!query) {
+    suggestionsBox.style.display = "none";
+    return;
+  }
+
+  // Match against stored features
+  const matches = searchableFeatures.filter((f) => f.name.includes(query));
+
+  if (matches.length === 0) {
+    suggestionsBox.style.display = "none";
+    return;
+  }
+
+  matches.slice(0, 10).forEach((f) => {
+    // Format: Upazila, District, Division
+    const parts = [f.upazila, f.district, f.division].filter(Boolean);
+    let label = parts.join(", ");
+
+    // Highlight match word
+    const regex = new RegExp(`(${query})`, "ig");
+    label = label.replace(regex, "<b>$1</b>");
+
+    const item = document.createElement("div");
+    item.innerHTML = label;
+    item.addEventListener("click", () => {
+      searchInput.value = f.displayName;
+      suggestionsBox.style.display = "none";
+      zoomToFeature(f.displayName);
+    });
+    suggestionsBox.appendChild(item);
+  });
+
+  suggestionsBox.style.display = "block";
+});
+
+// Hide suggestions when clicking outside
+document.addEventListener("click", (e) => {
+  if (!suggestionsBox.contains(e.target) && e.target !== searchInput) {
+    suggestionsBox.style.display = "none";
+  }
+});
 
 function prepareSearchIndex() {
   searchableFeatures.length = 0;
@@ -430,14 +472,14 @@ function zoomToFeature(name) {
   const feature = matches[0];
   const layer = feature.layer;
 
-  map.fitBounds(feature.bounds, { maxZoom: 14 });
+  // Fit bounds with a softer max zoom
+  map.fitBounds(feature.bounds, { maxZoom: 11 });
 
   // Dim all non-matching layers
   Object.values(geojsonLayers).forEach((layerGroup) => {
     if (!layerGroup) return;
     layerGroup.eachLayer((l) => {
       if (l !== layer) {
-        // Fade others (more dim than before)
         l.setStyle({
           fillOpacity: 0.05,
           opacity: 0.1,
@@ -450,24 +492,20 @@ function zoomToFeature(name) {
   layer.setStyle({
     color: "#000",
     weight: 3,
-    fillColor: "#f44336", // red highlight
+    fillColor: "#f44336",
     fillOpacity: 0.9,
     dashArray: "3, 3",
   });
 
-  // Ensure it stays on top
   layer.bringToFront();
 
   if (layer._path) {
     layer._path.style.filter = "drop-shadow(0 0 6px #f44336)";
   }
 
-  // Reset everything after 2.5 seconds
   setTimeout(() => {
     Object.entries(geojsonLayers).forEach(([level, layerGroup]) => {
       if (!layerGroup) return;
-
-      // Restore styles per level
       if (level === "level4") {
         layerGroup.setStyle(statusBasedStyle);
       } else if (level === "level5") {
@@ -480,11 +518,7 @@ function zoomToFeature(name) {
         layerGroup.setStyle(uniformStyle("#D32F2F", "#FFCDD2"));
       }
     });
-
-    // Remove drop-shadow if present
-    if (layer._path) {
-      layer._path.style.filter = "";
-    }
+    if (layer._path) layer._path.style.filter = "";
   }, 2500);
 }
 

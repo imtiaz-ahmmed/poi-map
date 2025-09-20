@@ -230,6 +230,24 @@ html {
   font-family: inherit;
 }
 
+.suggestions-box {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  max-height: 180px;
+  overflow-y: auto;
+  width: 250px;
+  z-index: 1000;
+  display: none;
+}
+.suggestions-box div {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.suggestions-box div:hover {
+  background: #f0f0f0;
+}
+
 /* Hamburger Button */
 .hamburger {
   position: fixed;
