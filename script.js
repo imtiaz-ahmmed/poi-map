@@ -556,38 +556,62 @@ function uniqueBoundaryStyle(palette) {
   };
 }
 
+const totalLayers = 4; // total files in Promise.all
+let loadedLayers = 0;
+
+function trackProgress() {
+  loadedLayers++;
+  const percent = Math.round((loadedLayers / totalLayers) * 100);
+  document.getElementById("mapProgressBar").style.width = percent + "%";
+  document.getElementById(
+    "mapProgressText"
+  ).textContent = `Loading map… ${percent}%`;
+
+  if (percent === 100) {
+    setTimeout(() => {
+      document.getElementById("mapLoader").style.display = "none";
+    }, 500); // hide after short delay
+  }
+}
+
+// Wrap your loadGeoJSON to call progress
+function loadGeoJSONWithProgress(url, styleFn, level, interactive = false) {
+  return loadGeoJSON(url, styleFn, level, interactive).then((res) => {
+    trackProgress();
+    return res;
+  });
+}
+
+// Use wrapped function inside Promise.all
 Promise.all([
-  loadGeoJSON(
+  loadGeoJSONWithProgress(
     "data/level1.geojson",
     uniformStyle("#D32F2F", "#FFCDD2"),
     "level1"
   ),
-  loadGeoJSON(
+  loadGeoJSONWithProgress(
     "data/level2.geojson",
     uniqueColorStyle(palettes.level2),
     "level2",
     true
   ),
-  loadGeoJSON(
+  loadGeoJSONWithProgress(
     "data/level3.geojson",
     uniqueBoundaryStyle(palettes.level3),
     "level3",
     true
   ),
-  loadGeoJSON("data/level4.geojson", statusBasedStyle, "level4", true),
-  loadGeoJSON(
-    "data/level5.geojson",
-    uniqueColorStyle(palettes.level5),
-    "level5",
+  loadGeoJSONWithProgress(
+    "data/level4.geojson",
+    statusBasedStyle,
+    "level4",
     true
   ),
 ]).then((results) => {
-  // results are objects {layer, data}
   level1Layer = results[0]?.layer;
   level2Layer = results[1]?.layer;
   level3Layer = results[2]?.layer;
   level4Layer = results[3]?.layer;
-  level5Layer = results[4]?.layer;
 
   level2Data = results[1]?.data;
   level3Data = results[2]?.data;
@@ -597,7 +621,6 @@ Promise.all([
 
   function updateLayers() {
     const z = map.getZoom();
-
     [level1Layer, level2Layer, level3Layer, level4Layer, level5Layer].forEach(
       (Lyr) => {
         if (Lyr) map.removeLayer(Lyr);
@@ -605,73 +628,51 @@ Promise.all([
     );
 
     if (z < 6.5) {
-      // Level 1
       if (level1Layer) map.addLayer(level1Layer);
     } else if (z >= 6.5 && z < 7.5) {
-      // Level 2
       if (level2Layer) map.addLayer(level2Layer);
     } else if (z >= 7.5 && z < 8) {
-      // Level 3 interactive
       if (level3Layer) {
         level3Layer.setStyle(uniqueBoundaryStyle(palettes.level3));
-        level3Layer.eachLayer((layer) => {
-          layer.options.interactive = true;
-        });
+        level3Layer.eachLayer((layer) => (layer.options.interactive = true));
         map.addLayer(level3Layer);
       }
     } else if (z >= 8 && z < 9) {
-      // Level 3 non-interactive + Level 4 fill
       if (level3Layer) {
         level3Layer.setStyle(uniqueBoundaryStyle(palettes.level3));
-        level3Layer.eachLayer((layer) => {
-          layer.options.interactive = false;
-        });
+        level3Layer.eachLayer((layer) => (layer.options.interactive = false));
         map.addLayer(level3Layer);
       }
       if (level4Layer) {
         level4Layer.setStyle(statusFillOnlyStyle);
-        level4Layer.eachLayer((layer) => {
-          layer.options.interactive = true;
-        });
+        level4Layer.eachLayer((layer) => (layer.options.interactive = true));
         map.addLayer(level4Layer);
       }
     } else if (z >= 9 && z < 14.5) {
-      // Level 3 non-interactive + Level 4 styled
       if (level3Layer) {
         level3Layer.setStyle(uniqueBoundaryStyle(palettes.level3));
-        level3Layer.eachLayer((layer) => {
-          layer.options.interactive = false;
-        });
+        level3Layer.eachLayer((layer) => (layer.options.interactive = false));
         map.addLayer(level3Layer);
       }
       if (level4Layer) {
         level4Layer.setStyle(statusBasedStyle);
-        level4Layer.eachLayer((layer) => {
-          layer.options.interactive = true;
-        });
+        level4Layer.eachLayer((layer) => (layer.options.interactive = true));
         map.addLayer(level4Layer);
       }
     } else {
-      // Level 5 + Level 4 non-interactive + Level 3 on top
       if (level5Layer) {
         level5Layer.setStyle(uniqueBoundaryStyle(palettes.level5));
-        level5Layer.eachLayer((layer) => {
-          layer.options.interactive = true;
-        });
+        level5Layer.eachLayer((layer) => (layer.options.interactive = true));
         map.addLayer(level5Layer);
       }
       if (level4Layer) {
         level4Layer.setStyle(statusBasedStyle);
-        level4Layer.eachLayer((layer) => {
-          layer.options.interactive = false;
-        });
+        level4Layer.eachLayer((layer) => (layer.options.interactive = false));
         map.addLayer(level4Layer);
       }
       if (level3Layer) {
         level3Layer.setStyle(uniqueBoundaryStyle(palettes.level3));
-        level3Layer.eachLayer((layer) => {
-          layer.options.interactive = false;
-        });
+        level3Layer.eachLayer((layer) => (layer.options.interactive = false));
         map.addLayer(level3Layer);
         level3Layer.bringToFront();
       }
@@ -681,9 +682,32 @@ Promise.all([
   map.on("zoomend", updateLayers);
   updateLayers();
 
-  // populate dropdowns and search index
   populateDivisionDropdown();
   prepareSearchIndex();
+
+  // ---- Background load Level-5 ----
+  const badge = document.createElement("div");
+  badge.id = "level5Badge";
+  badge.innerText = "Loading detailed boundaries…";
+  badge.style.cssText = `
+    position:absolute;bottom:10px;right:10px;
+    background:#fff;padding:5px 10px;
+    border-radius:6px;font-size:12px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    z-index:2000;
+  `;
+  document.body.appendChild(badge);
+
+  loadGeoJSON(
+    "data/level5.geojson",
+    uniqueColorStyle(palettes.level5),
+    "level5",
+    true
+  ).then((res) => {
+    level5Layer = res.layer;
+    badge.innerText = "Detailed boundaries ready ✔";
+    setTimeout(() => badge.remove(), 2000);
+  });
 });
 
 // ---- DROPDOWNS (cascading) ----

@@ -247,6 +247,41 @@ html {
 .suggestions-box div:hover {
   background: #f0f0f0;
 }
+.map-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  font-family: Arial, sans-serif;
+  z-index: 3000;
+}
+
+.progress-box {
+  width: 300px;
+  height: 18px;
+  background: #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #42a5f5, #1565c0);
+  transition: width 0.3s ease;
+}
+
+#mapProgressText {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
 
 /* Hamburger Button */
 .hamburger {
