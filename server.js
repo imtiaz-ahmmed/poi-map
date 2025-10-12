@@ -75,6 +75,37 @@ app.get("/get-poi", async (req, res) => {
     res.status(500).send({ error: "Failed to read data" });
   }
 });
+// ---- Helper to normalize mixed date formats to YYYY-MM-DD ----
+function normalizeDate(value) {
+  if (!value) return "";
+  value = value
+    .trim()
+    .replace(/[.,\s]+/g, "/")
+    .replace(/-/g, "/");
+  const parts = value.split("/");
+  let day, month, year;
+
+  if (parts.length === 3) {
+    [day, month, year] = parts.map((p) => p.padStart(2, "0"));
+
+    // if month > 12, swap (handles DD/MM/YYYY format)
+    if (parseInt(month) > 12 && parseInt(day) <= 12) {
+      [day, month] = [month, day];
+    }
+
+    // handle short year like 25 → 2025
+    if (year.length === 2) {
+      year = parseInt(year) > 50 ? "19" + year : "20" + year;
+    }
+
+    const iso = `${year}-${month}-${day}`;
+    const test = new Date(iso);
+    if (!isNaN(test)) return iso;
+  }
+
+  const d = new Date(value);
+  return isNaN(d) ? "" : d.toISOString().split("T")[0];
+}
 
 app.post("/update-poi", async (req, res) => {
   try {
@@ -128,8 +159,8 @@ app.post("/update-poi", async (req, res) => {
         props.Status = status;
         props.Notes = notes ? notes.toString() : "";
         props.Completed_By = userName || "";
-        props.Start_Date = startDate || "";
-        props.End_Date = endDate || "";
+        props.Start_Date = normalizeDate(startDate);
+        props.End_Date = normalizeDate(endDate);
         updated = true;
       }
     });
