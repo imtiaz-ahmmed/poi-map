@@ -78,10 +78,24 @@
         <input type="text" id="userName" placeholder="Enter name" />
 
         <label for="startDate">Start Date</label>
-        <input type="date" id="startDate" />
+        <div class="date-wrapper">
+          <input
+            type="text"
+            id="startDate"
+            placeholder="Type, paste or pick date"
+          />
+          <span class="calendar-icon">📅</span>
+        </div>
 
         <label for="endDate">End Date</label>
-        <input type="date" id="endDate" />
+        <div class="date-wrapper">
+          <input
+            type="text"
+            id="endDate"
+            placeholder="Type, paste or pick date"
+          />
+          <span class="calendar-icon">📅</span>
+        </div>
 
         <label for="statusSelect">Status</label>
         <select id="statusSelect" required>
