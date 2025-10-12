@@ -648,7 +648,7 @@ Promise.all([
         level4Layer.eachLayer((layer) => (layer.options.interactive = true));
         map.addLayer(level4Layer);
       }
-    } else if (z >= 9 && z < 14.5) {
+    } else if (z >= 9 && z < 11.2) {
       if (level3Layer) {
         level3Layer.setStyle(uniqueBoundaryStyle(palettes.level3));
         level3Layer.eachLayer((layer) => (layer.options.interactive = false));
@@ -787,9 +787,17 @@ document
     const upazila = e.target.value;
 
     if (!division || !district || !upazila) {
-      document.getElementById("poiCount").value = "";
-      document.getElementById("statusSelect").value = "";
-      document.getElementById("notes").value = "";
+      document.getElementById("poiCount").value = data.poiCount ?? "";
+      document.getElementById("statusSelect").value = data.status ?? "";
+      document.getElementById("notes").value = data.notes ?? "";
+      document.getElementById("userName").value = data.userName ?? "";
+      document.getElementById("startDate").value = normalizeDateInput(
+        data.startDate
+      );
+      document.getElementById("endDate").value = normalizeDateInput(
+        data.endDate
+      );
+
       return;
     }
 
@@ -806,9 +814,18 @@ document
       const data = await res.json();
 
       // Populate form fields
+      // Populate form fields (including all optional ones)
       document.getElementById("poiCount").value = data.poiCount ?? "";
       document.getElementById("statusSelect").value = data.status ?? "";
       document.getElementById("notes").value = data.notes ?? "";
+      document.getElementById("userName").value = data.userName ?? "";
+      document.getElementById("startDate").value = normalizeDateInput(
+        data.startDate
+      );
+      document.getElementById("endDate").value = normalizeDateInput(
+        data.endDate
+      );
+      showToast("Existing POI data loaded ✅");
     } catch (err) {
       console.error(err);
       alert("Could not load existing POI data.");
@@ -890,6 +907,88 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape" && sidebar.classList.contains("open")) {
       closeSidebar();
     }
+  });
+});
+
+// Format text to YYYY-MM-DD safely
+function normalizeDateInput(value) {
+  if (!value) return "";
+
+  const v = value.trim();
+
+  // if already looks like YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+
+  // Replace . , and space with /
+  let cleaned = v.replace(/[.,\s]+/g, "/").replace(/-/g, "/");
+
+  const parts = cleaned.split("/");
+  let day, month, year;
+
+  if (parts.length === 3) {
+    // try DD/MM/YYYY or DD/MM/YY first
+    [day, month, year] = parts.map((p) => p.padStart(2, "0"));
+
+    // if month > 12 then it's swapped
+    if (parseInt(month) > 12 && parseInt(day) <= 12) {
+      [day, month] = [month, day];
+    }
+
+    // fix short year
+    if (year.length === 2) {
+      year = parseInt(year) > 50 ? "19" + year : "20" + year;
+    }
+
+    // build a valid ISO date
+    const iso = `${year}-${month}-${day}`;
+    const test = new Date(iso);
+    if (!isNaN(test)) return iso;
+  }
+
+  // fallback: try Date() parser
+  const d = new Date(v);
+  if (!isNaN(d)) return d.toISOString().split("T")[0];
+
+  return v; // fallback raw
+}
+
+// Allow typing, pasting, and calendar selection for dates
+["startDate", "endDate"].forEach((id) => {
+  const input = document.getElementById(id);
+  const wrapper = input.parentElement;
+  const icon = wrapper.querySelector(".calendar-icon");
+
+  // Hidden native date picker
+  const hiddenPicker = document.createElement("input");
+  hiddenPicker.type = "date";
+  hiddenPicker.style.position = "absolute";
+  hiddenPicker.style.opacity = "0";
+  hiddenPicker.style.pointerEvents = "none";
+  wrapper.appendChild(hiddenPicker);
+
+  // Open date picker when clicking icon
+  const openPicker = () => {
+    hiddenPicker.focus();
+    hiddenPicker.click();
+  };
+  icon.addEventListener("click", openPicker);
+
+  // When a date is selected from calendar
+  hiddenPicker.addEventListener("change", () => {
+    input.value = hiddenPicker.value;
+  });
+
+  // Auto-format when leaving field
+  input.addEventListener("blur", () => {
+    input.value = normalizeDateInput(input.value);
+  });
+
+  // Auto-format when pasting
+  input.addEventListener("paste", (e) => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData("text");
+    const formatted = normalizeDateInput(text.trim());
+    input.value = formatted;
   });
 });
 
